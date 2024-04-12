@@ -6,12 +6,12 @@ Creating CI/CD setup and deploying an sample java application using CFT template
 
 Action item consists of below parameters:
 
-> Sample java code
-> buildspec.yaml 
-> Dockerfile
-> CFT templates
-   > iam.yaml 
-   > cicd-cft-template-v2.yaml
+- Sample java code
+- buildspec.yaml 
+- Dockerfile
+- CFT templates
+   - iam.yaml 
+   - cicd-cft-template-v2.yaml
 
 Upload the source code in AWS code commit:
 
