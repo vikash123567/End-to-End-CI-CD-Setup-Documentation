@@ -25,4 +25,15 @@ provide stack name, codeBucket, CodePipelineArtifactBucket and EcrDockerReposito
 
 ![image](https://github.com/vikash123567/End-to-End-CI-CD-Setup-Documentation/assets/96052543/cf35a719-4d71-421c-b5b3-504e977ef22a)
 
+Below resources are created:
+
+![image](https://github.com/vikash123567/End-to-End-CI-CD-Setup-Documentation/assets/96052543/6fc5eb84-0e18-4303-af30-ecb62db0d8b0)
+
+Upload cicd-cft-template-v2.yaml
+
+![image](https://github.com/vikash123567/End-to-End-CI-CD-Setup-Documentation/assets/96052543/14381c0a-b2ee-40e3-9a4b-a22afd59cc63)
+
+![image](https://github.com/vikash123567/End-to-End-CI-CD-Setup-Documentation/assets/96052543/704da79f-fa89-4765-9618-aebbe95c33d9)
+
+
 This document provides a comprehensive guide for setting up a CI/CD pipeline using AWS services. Follow the steps carefully to ensure a successful deployment and integration of your development workflow.
