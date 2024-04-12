@@ -1,0 +1,186 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  CodePipelineArtifactBucket: 
+    Type: String
+    Default: ""
+  CodeBucket: 
+    Type: String
+    Default: ""
+  EcrDockerRepository:
+    Type: String
+    Default: ""
+  
+
+Resources:
+  CodePipelineServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codepipeline.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub ${AWS::StackName}-codepipeline-access-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Resource: "*"
+                Effect: Allow
+                Action:
+                  - codebuild:StartBuild
+                  - codebuild:BatchGetBuilds
+                  - codecommit:GetBranch
+                  - codecommit:GetCommit
+                  - codecommit:UploadArchive
+                  - codecommit:GetUploadArchiveStatus
+                  - codecommit:CancelUploadArchive
+                  - iam:PassRole
+              - Resource: !Sub arn:aws:s3:::${CodePipelineArtifactBucket}/*
+                Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                  - s3:GetBucketVersioning
+              - Resource: !Sub arn:aws:s3:::${CodeBucket}/*
+                Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                  - s3:GetBucketVersioning
+    
+
+  AmazonCloudWatchEventRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: !Sub ${AWS::StackName}-cwe-pipeline-execution-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: 'codepipeline:StartPipelineExecution'
+                Resource: !Join 
+                  - ''
+                  - - 'arn:aws:codepipeline:'
+                    - !Ref 'AWS::Region'
+                    - ':'
+                    - !Ref 'AWS::AccountId'
+                    - ':*'
+
+
+  CodeBuildServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub ${AWS::StackName}-codebuild-service-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              # - Resource: !Sub arn:aws:iam::${AWS::AccountId}:role/${KubectlRoleName}
+              #   Effect: Allow
+              #   Action:
+              #     - sts:AssumeRole
+              - Resource: '*'
+                Effect: Allow
+                Action:
+                  - eks:*
+              - Resource: '*'
+                Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+              - Resource: '*'
+                Effect: Allow
+                Action:
+                  - ssm:Describe*
+                  - ssm:Get*
+                  - ssm:List*
+              - Resource: '*'
+                Effect: Allow
+                Action:
+                  - ecr:GetAuthorizationToken
+              - Resource: '*'
+                Effect: Allow
+                Action:
+                  - ec2:CreateNetworkInterface
+                  - ec2:DescribeDhcpOptions
+                  - ec2:DescribeNetworkInterfaces
+                  - ec2:DeleteNetworkInterface
+                  - ec2:DescribeSubnets
+                  - ec2:DescribeSecurityGroups
+                  - ec2:DescribeVpcs
+                  - ec2:CreateNetworkInterfacePermission
+              - Resource: !Sub arn:aws:s3:::${CodePipelineArtifactBucket}/*
+                Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:GetObjectVersion
+              - Resource: !Sub arn:aws:s3:::${CodeBucket}/* 
+                Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                  - s3:GetBucketVersioning
+              - Resource: !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${EcrDockerRepository}
+                Effect: Allow
+                Action:
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:BatchGetImage
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:PutImage
+                  - ecr:InitiateLayerUpload
+                  - ecr:UploadLayerPart
+                  - ecr:CompleteLayerUpload
+              - Resource: '*'
+                Effect: Allow
+                Action:
+                  - ecr-public:*
+                  - sts:GetServiceBearerToken
+    
+
+
+Outputs:
+  CodePipelineServiceRoleArn:
+    Description: ARN of the CodePipeline service role
+    Value: !GetAtt CodePipelineServiceRole.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-CodePipelineServiceRoleArn"
+
+  CodeBuildServiceRoleArn:
+    Description: ARN of the CodeBuild service role
+    Value: !GetAtt CodeBuildServiceRole.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-CodeBuildServiceRoleArn"          
+
+  CloudWatchEventRoleArn:
+    Description: ARN of the CloudWatch Event role
+    Value: !GetAtt AmazonCloudWatchEventRole.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-CloudWatchEventRoleArn"

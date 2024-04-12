@@ -1,0 +1,26 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - yum install -y jq
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - aws ecr get-login-password --region us-west-1 | docker login --username AWS --password-stdin 954503069243.dkr.ecr.us-west-1.amazonaws.com
+      - REPOSITORY_URI=954503069243.dkr.ecr.us-west-1.amazonaws.com/demo
+                       
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      #- docker build -t 596343352176.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$Repositorys_Name-$Branch_Name:$CODEBUILD_BUILD_NUMBER .
+      - docker build -t demo .
+      - docker tag demo:latest 954503069243.dkr.ecr.us-west-1.amazonaws.com/demo:latest
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker images...
+      #- docker push 596343352176.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$Repository_Name-$Branch_Name:$CODEBUILD_BUILD_NUMBER
+      - docker push 954503069243.dkr.ecr.us-west-1.amazonaws.com/demo:latest
