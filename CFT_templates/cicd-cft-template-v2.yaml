@@ -5,19 +5,27 @@ Description: EKSWSV1
 
 Parameters:
 
-  commonstacknameparameter:
-    Type: String
-    Default: iam-poc
-
-  BranchName:
-    Description: CodeCommit branch name
-    Type: String
-    Default: master
-
-  RepositoryName:
+  1CodeCommitRepositoryName:
     Description: CodeComit repository name
     Type: String
-    Default: poc
+    Default: ""
+
+  2BranchName:
+    Description: CodeCommit branch name
+    Type: String
+    Default: ""
+
+  3EcrDockerRepository:
+    Type: String
+    Description: The name of the ECR Repository created
+    Default: ""
+    MinLength: 0
+    MaxLength: 100
+    ConstraintDescription: You must enter the ECR Repository name
+
+  IAMstacknameparameter:
+    Type: String
+    Default: "codepipeline-iam-stack"
 
   CodeBuildDockerImage:
     Type: String
@@ -34,15 +42,7 @@ Parameters:
     MinLength: 3
     MaxLength: 100
     ConstraintDescription: You must enter a kubectl IAM role
-  
-  EcrDockerRepository:
-    Type: String
-    Description: The name of the ECR Repository created
-    Default: demo
-    MinLength: 1
-    MaxLength: 100
-    ConstraintDescription: You must enter the ECR Repository name
-  
+    
   CodePipelineArtifactBucket:
     Type: String
     Description: The name of the S3 Bucket created
@@ -59,57 +59,57 @@ Parameters:
     MaxLength: 100
     ConstraintDescription: You must enter the S3 Bucket created
 
-Metadata:
-  AWS::CloudFormation::Interface:
-    ParameterGroups:
-      # - Label:
-      #     default: GitHub
-      #   Parameters:
-      #     - GitHubUser
-      #     - GitHubToken
-      #     - GitSourceRepo
-      #     - GitBranch
-      - Label:
-          default: CodeBuild
-        Parameters:
-          - CodeBuildDockerImage
-      - Label:
-          default: IAM
-        Parameters:
-          - KubectlRoleName
-      #- Label:
-      #    default: EKS
-      #  Parameters:
-      #    - EksClusterName
-      - Label:
-          default: ECR
-        Parameters: 
-          - EcrDockerRepository
-      - Lable:
-          default: s3
-        Parameters:
-          - CodePipelineArtifactBucket
-    ParameterLabels:
-      # GitHubUser:
-      #   default: Username
-      # GitHubToken:
-      #   default: Access token
-      # GitSourceRepo:
-      #   default: Repository
-      # GitBranch:
-      #   default: Branch
-      CodeBuildDockerImage:
-        default: Docker image
-      KubectlRoleName:
-        default: kubectl IAM role
-      #EksClusterName:
-      #  default: EKS cluster name
-      EcrDockerRepository:
-        default: ECR Repository Name
-      CodePipelineArtifactBucket:
-        default: CodePipeline-Artifacts  s3 Bucket Name
-      CodeBucket:
-        default: s3 Code bucket 
+# Metadata:
+#   AWS::CloudFormation::Interface:
+#     ParameterGroups:
+#       # - Label:
+#       #     default: GitHub
+#       #   Parameters:
+#       #     - GitHubUser
+#       #     - GitHubToken
+#       #     - GitSourceRepo
+#       #     - GitBranch
+#       - Label:
+#           default: CodeBuild
+#         Parameters:
+#           - CodeBuildDockerImage
+#       - Label:
+#           default: IAM
+#         Parameters:
+#           - KubectlRoleName
+#       #- Label:
+#       #    default: EKS
+#       #  Parameters:
+#       #    - EksClusterName
+#       - Label:
+#           default: ECR
+#         Parameters: 
+#           - EcrDockerRepository
+#       - Lable:
+#           default: s3
+#         Parameters:
+#           - CodePipelineArtifactBucket
+#     ParameterLabels:
+#       # GitHubUser:
+#       #   default: Username
+#       # GitHubToken:
+#       #   default: Access token
+#       # GitSourceRepo:
+#       #   default: Repository
+#       # GitBranch:
+#       #   default: Branch
+#       CodeBuildDockerImage:
+#         default: Docker image
+#       KubectlRoleName:
+#         default: kubectl IAM role
+#       #EksClusterName:
+#       #  default: EKS cluster name
+#       EcrDockerRepository:
+#         default: ECR Repository name
+#       CodePipelineArtifactBucket:
+#         default: CodePipeline-Artifacts  s3 Bucket Name
+#       CodeBucket:
+#         default: s3 Code bucket 
 
 
 Resources:
@@ -130,7 +130,7 @@ Resources:
               - ':'
               - !Ref 'AWS::AccountId'
               - ':'
-              - !Ref RepositoryName
+              - !Ref 1CodeCommitRepositoryName
         detail:
           event:
             - referenceCreated
@@ -138,7 +138,7 @@ Resources:
           referenceType:
             - branch
           referenceName:
-            - !Ref BranchName
+            - !Ref 2BranchName
       Targets:
         - Arn: !Join 
             - ''
@@ -149,7 +149,7 @@ Resources:
               - ':'
               - !Ref CodePipeline
           RoleArn: 
-            'Fn::ImportValue': !Sub '${commonstacknameparameter}-CloudWatchEventRoleArn'
+            'Fn::ImportValue': !Sub '${IAMstacknameparameter}-CloudWatchEventRoleArn'
           Id: codepipeline-AppPipeline
 
 
@@ -167,16 +167,16 @@ Resources:
         PrivilegedMode: true
         EnvironmentVariables:
           - Name: REPOSITORY_URI
-            Value: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${EcrDockerRepository}
+            Value: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${3EcrDockerRepository}
           - Name: REPOSITORY_NAME
-            Value: !Ref RepositoryName
+            Value: !Ref 1CodeCommitRepositoryName
           - Name: REPOSITORY_BRANCH
-            Value: !Ref BranchName
+            Value: !Ref 2BranchName
           - Name: ENVIRONMENT_NAME
-            Value: !Ref BranchName
+            Value: !Ref 2BranchName
       Name: !Sub ${AWS::StackName}-build
       ServiceRole: 
-        'Fn::ImportValue': !Sub '${commonstacknameparameter}-CodeBuildServiceRoleArn'
+        'Fn::ImportValue': !Sub '${IAMstacknameparameter}-CodeBuildServiceRoleArn'
       #VpcConfig:
       #    SecurityGroupIds: 
       #      - sg-0c27b861adc1200f8
@@ -191,7 +191,7 @@ Resources:
     Type: AWS::CodePipeline::Pipeline
     Properties:
       RoleArn: 
-        'Fn::ImportValue': !Sub '${commonstacknameparameter}-CodePipelineServiceRoleArn'
+        'Fn::ImportValue': !Sub '${IAMstacknameparameter}-CodePipelineServiceRoleArn'
       Name: !Sub ${AWS::StackName}-pipeline
       ArtifactStore:
         Type: S3
@@ -208,8 +208,8 @@ Resources:
               OutputArtifacts:
                 - Name: SourceOutput
               Configuration:
-                BranchName: !Ref BranchName
-                RepositoryName: !Ref RepositoryName
+                BranchName: !Ref 2BranchName
+                CodeCommitRepositoryName: !Ref 1CodeCommitRepositoryName
                 PollForSourceChanges: false
               RunOrder: 1
         - Name: Build
