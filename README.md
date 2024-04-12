@@ -43,4 +43,8 @@ Below resources are created:
 
 ![image](https://github.com/vikash123567/End-to-End-CI-CD-Setup-Documentation/assets/96052543/27191887-6331-4952-be57-d0f3c544cb3f)
 
+simultaneously image has been pushed to ECR repo:
+
+![image](https://github.com/vikash123567/End-to-End-CI-CD-Setup-Documentation/assets/96052543/c66f778e-220c-4510-af00-e8f5cb7a28a1)
+
 This document provides a comprehensive guide for setting up a CI/CD pipeline using AWS services. Follow the steps carefully to ensure a successful deployment and integration of your development workflow.
