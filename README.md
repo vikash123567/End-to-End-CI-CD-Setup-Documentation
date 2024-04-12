@@ -35,5 +35,12 @@ Upload cicd-cft-template-v2.yaml
 
 ![image](https://github.com/vikash123567/End-to-End-CI-CD-Setup-Documentation/assets/96052543/704da79f-fa89-4765-9618-aebbe95c33d9)
 
+Below resources are created:
+
+![image](https://github.com/vikash123567/End-to-End-CI-CD-Setup-Documentation/assets/96052543/b7463c24-b644-4513-bd9c-0306c0f47395)
+
+![image](https://github.com/vikash123567/End-to-End-CI-CD-Setup-Documentation/assets/96052543/68fc8945-111c-4436-80ea-ca482e99ca5d)
+
+![image](https://github.com/vikash123567/End-to-End-CI-CD-Setup-Documentation/assets/96052543/27191887-6331-4952-be57-d0f3c544cb3f)
 
 This document provides a comprehensive guide for setting up a CI/CD pipeline using AWS services. Follow the steps carefully to ensure a successful deployment and integration of your development workflow.
