@@ -19,7 +19,9 @@ Upload the source code in AWS code commit:
 
 Now create stack in AWS cloud formation template console:
 
-Upload iam.yaml file first which will create roles for code build, code pipeline and cloud watch
+stack name should be - "codepipeline-iam-stack"
+
+Upload iam.yaml file first which will create roles for code build, code pipeline and cloud watch 
 
 provide stack name, codeBucket, CodePipelineArtifactBucket and EcrDockerRepository as below:
 
