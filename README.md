@@ -33,6 +33,8 @@ Below resources are created:
 
 Upload cicd-cft-template-v2.yaml
 
+provide codecommit name, branch name, ecr repo name as per the requirement for creating the pipeline
+
 ![image](https://github.com/vikash123567/End-to-End-CI-CD-Setup-Documentation/assets/96052543/d863face-5dbc-4197-9c22-f64612749f4e)
 
 ![image](https://github.com/vikash123567/End-to-End-CI-CD-Setup-Documentation/assets/96052543/b003feaa-1419-45c0-99bd-1e675d9b30ab)
