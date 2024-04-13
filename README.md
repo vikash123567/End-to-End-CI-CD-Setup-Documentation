@@ -15,7 +15,7 @@ Action item consists of below parameters:
 
 Upload the source code in AWS code commit:
 
-![code_commit](images/code_commit.png)
+![image](https://github.com/vikash123567/End-to-End-CI-CD-Setup-Documentation/assets/96052543/43f9f39d-245f-49de-99da-96f6c95b4b6d)
 
 Now create stack in AWS cloud formation template console:
 
